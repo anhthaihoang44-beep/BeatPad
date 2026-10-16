@@ -23,7 +23,7 @@ struct TracksView: View {
                                         audio.stopAll()
                                     } else {
                                         playingTrackId = track.id
-                                        audio.playPad(index: 4) // Play bass preview
+                                        audio.playPad(index: 4)
                                     }
                                 }
                             )
@@ -79,14 +79,16 @@ struct TrackCardItem: View {
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundColor(AppTheme.neonCyan)
 
-                    Text("•")
+                    Text("|")
+                        .font(.system(size: 10))
                         .foregroundColor(AppTheme.textSecondary)
 
                     Text(track.duration)
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundColor(AppTheme.textSecondary)
 
-                    Text("•")
+                    Text("|")
+                        .font(.system(size: 10))
                         .foregroundColor(AppTheme.textSecondary)
 
                     Text("\(track.bpm) BPM")

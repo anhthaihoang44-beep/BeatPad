@@ -181,10 +181,10 @@ struct LearnView: View {
                     .navigationTitle("Learn Mode")
                 }
             }
-            .alert(isPresented: ) {
+            .alert(isPresented: $showScoreModal) {
                 Alert(
-                    title: Text("Lesson Complete! ??"),
-                    message: Text("Awesome rhythm skills!\nFinal Score: \(score)\nAccuracy: 95% ???"),
+                    title: Text("Lesson Complete!"),
+                    message: Text("Awesome rhythm skills!\nFinal Score: \(score)\nAccuracy: 95% - 3 Stars!"),
                     dismissButton: .default(Text("Done"), action: { stopArena() })
                 )
             }
@@ -207,7 +207,7 @@ struct LearnView: View {
         if tappedIndex == targetIndex {
             score += 100 + (combo * 10)
             combo += 1
-            feedbackText = "PERFECT! ??"
+            feedbackText = "PERFECT!"
             feedbackColor = AppTheme.neonGreen
 
             currentStepIndex += 1

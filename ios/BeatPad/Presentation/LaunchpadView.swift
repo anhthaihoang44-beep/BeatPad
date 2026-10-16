@@ -34,7 +34,8 @@ struct LaunchpadView: View {
                             .font(.system(size: 11, weight: .semibold))
                             .foregroundColor(AppTheme.textSecondary)
 
-                        Text("•")
+                        Text("|")
+                            .font(.system(size: 10))
                             .foregroundColor(AppTheme.textSecondary)
 
                         Text(audio.currentPack.key)

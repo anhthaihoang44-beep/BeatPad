@@ -16,42 +16,36 @@ jobs:
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer || sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 
-      - name: Validate and Lint Project
-        run: |
-          plutil -lint ios/BeatPad.xcodeproj/project.pbxproj || echo "PBXPROJ LINT FAILED"
-
-      - name: Inspect Xcode Project
-        run: |
-          xcodebuild -list -project ios/BeatPad.xcodeproj || true
-
-      - name: Build with Swiftc / Clang if needed
+      - name: Compile BeatPad iOS Executable with swiftc
         run: |
           mkdir -p build/BeatPad.app
-          swiftc -target arm64-apple-ios16.0 -sdk $(xcrun --sdk iphoneos --show-sdk-path) \
+          SDK_PATH=$(xcrun --sdk iphoneos --show-sdk-path)
+          echo "Using SDK at: $SDK_PATH"
+          swiftc -v -target arm64-apple-ios16.0 -sdk "$SDK_PATH" \
+            -framework SwiftUI \
+            -framework UIKit \
+            -framework AVFoundation \
+            -framework Foundation \
+            -framework Combine \
             ios/BeatPad/App/BeatPadApp.swift \
             ios/BeatPad/Core/AudioEngine.swift \
             ios/BeatPad/Presentation/MainTabView.swift \
             ios/BeatPad/Presentation/LaunchpadView.swift \
             ios/BeatPad/Presentation/SequencerView.swift \
             -o build/BeatPad.app/BeatPad \
-            -emit-executable || echo "Direct swiftc failed, trying xcodebuild..."
+            -emit-executable
+          ls -lh build/BeatPad.app/BeatPad
+          file build/BeatPad.app/BeatPad
 
-      - name: Package IPA
+      - name: Package Real IPA
         run: |
           mkdir -p Payload/BeatPad.app
-          if [ -f "build/BeatPad.app/BeatPad" ]; then
-            echo "Direct swiftc binary succeeded!"
-            cp -R build/BeatPad.app/* Payload/BeatPad.app/
-          else
-            echo "Falling back to xcodebuild..."
-            xcodebuild build -project ios/BeatPad.xcodeproj -scheme BeatPad -sdk iphoneos -configuration Release -derivedDataPath xcode_build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO || true
-            APP_PATH=$(find xcode_build/Build/Products -name "BeatPad.app" | head -n 1)
-            if [ -n "$APP_PATH" ]; then
-              cp -R "$APP_PATH" Payload/
-            fi
-          fi
+          cp build/BeatPad.app/BeatPad Payload/BeatPad.app/
           cp ios/BeatPad/Info.plist Payload/BeatPad.app/Info.plist
           echo "APPL????" > Payload/BeatPad.app/PkgInfo
+          if [ -d "app/src/main/assets" ]; then
+            cp -R app/src/main/assets/* Payload/BeatPad.app/
+          fi
           zip -r BeatPad_iOS.ipa Payload
           ls -lh BeatPad_iOS.ipa
 

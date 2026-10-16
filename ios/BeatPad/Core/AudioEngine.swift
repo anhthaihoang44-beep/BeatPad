@@ -277,33 +277,33 @@ final class AudioEngine: ObservableObject {
             let val = sin(2.0 * Double.pi * freq * t) * decay
             let sample16 = Int16(max(-32767.0, min(32767.0, val * 32000.0)))
             var littleEndian = sample16.littleEndian
-            withUnsafeBytes(of: &littleEndian) { pcmData.append(contentsOf: ) }
+            withUnsafeBytes(of: &littleEndian) { ptr in pcmData.append(contentsOf: ptr) }
         }
 
         // Build standard WAV header
         var wav = Data()
         wav.append("RIFF".data(using: .ascii)!)
         var chunkSize = UInt32(36 + pcmData.count).littleEndian
-        withUnsafeBytes(of: &chunkSize) { wav.append(contentsOf: ) }
+        withUnsafeBytes(of: &chunkSize) { ptr in wav.append(contentsOf: ptr) }
         wav.append("WAVE".data(using: .ascii)!)
         wav.append("fmt ".data(using: .ascii)!)
         var subchunk1Size = UInt32(16).littleEndian
-        withUnsafeBytes(of: &subchunk1Size) { wav.append(contentsOf: ) }
+        withUnsafeBytes(of: &subchunk1Size) { ptr in wav.append(contentsOf: ptr) }
         var audioFormat = UInt16(1).littleEndian
-        withUnsafeBytes(of: &audioFormat) { wav.append(contentsOf: ) }
+        withUnsafeBytes(of: &audioFormat) { ptr in wav.append(contentsOf: ptr) }
         var numChannels = UInt16(1).littleEndian
-        withUnsafeBytes(of: &numChannels) { wav.append(contentsOf: ) }
+        withUnsafeBytes(of: &numChannels) { ptr in wav.append(contentsOf: ptr) }
         var sRate = UInt32(sampleRate).littleEndian
-        withUnsafeBytes(of: &sRate) { wav.append(contentsOf: ) }
+        withUnsafeBytes(of: &sRate) { ptr in wav.append(contentsOf: ptr) }
         var byteRate = UInt32(sampleRate * 2).littleEndian
-        withUnsafeBytes(of: &byteRate) { wav.append(contentsOf: ) }
+        withUnsafeBytes(of: &byteRate) { ptr in wav.append(contentsOf: ptr) }
         var blockAlign = UInt16(2).littleEndian
-        withUnsafeBytes(of: &blockAlign) { wav.append(contentsOf: ) }
+        withUnsafeBytes(of: &blockAlign) { ptr in wav.append(contentsOf: ptr) }
         var bitsPerSample = UInt16(16).littleEndian
-        withUnsafeBytes(of: &bitsPerSample) { wav.append(contentsOf: ) }
+        withUnsafeBytes(of: &bitsPerSample) { ptr in wav.append(contentsOf: ptr) }
         wav.append("data".data(using: .ascii)!)
         var dataSize = UInt32(pcmData.count).littleEndian
-        withUnsafeBytes(of: &dataSize) { wav.append(contentsOf: ) }
+        withUnsafeBytes(of: &dataSize) { ptr in wav.append(contentsOf: ptr) }
         wav.append(pcmData)
 
         return try? AVAudioPlayer(data: wav)

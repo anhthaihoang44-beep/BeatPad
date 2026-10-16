@@ -21,17 +21,15 @@ jobs:
           mkdir -p build/BeatPad.app
           SDK_PATH=$(xcrun --sdk iphoneos --show-sdk-path)
           echo "Using SDK at: $SDK_PATH"
+          SWIFT_FILES=$(find ios/BeatPad -name "*.swift" | sort | tr '\n' ' ')
+          echo "Compiling Swift files: $SWIFT_FILES"
           swiftc -v -target arm64-apple-ios16.0 -sdk "$SDK_PATH" \
             -framework SwiftUI \
             -framework UIKit \
             -framework AVFoundation \
             -framework Foundation \
             -framework Combine \
-            ios/BeatPad/App/BeatPadApp.swift \
-            ios/BeatPad/Core/AudioEngine.swift \
-            ios/BeatPad/Presentation/MainTabView.swift \
-            ios/BeatPad/Presentation/LaunchpadView.swift \
-            ios/BeatPad/Presentation/SequencerView.swift \
+            $SWIFT_FILES \
             -o build/BeatPad.app/BeatPad \
             -emit-executable
           ls -lh build/BeatPad.app/BeatPad
